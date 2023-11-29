@@ -42,6 +42,8 @@ public fun ApplicationCall.resolveResource(
     return null
 }
 
+private val resourceCache by lazy { mutableMapOf<String, URL>() }
+
 @OptIn(InternalAPI::class)
 internal fun Application.resolveResource(
     path: String,
@@ -54,14 +56,15 @@ internal fun Application.resolveResource(
     }
 
     val normalizedPath = normalisedPath(resourcePackage, path)
-
-    for (url in classLoader.getResources(normalizedPath).asSequence()) {
-        resourceClasspathResource(url, normalizedPath, mimeResolve)?.let { content ->
-            return url to content
-        }
+    val cacheKey = "${classLoader.hashCode()}/$normalizedPath"
+    val resolveContent: (URL) -> Pair<URL, OutgoingContent.ReadChannelContent>? = { url ->
+        resourceClasspathResource(url, normalizedPath, mimeResolve)?.let { url to it }
     }
-
-    return null
+    return resourceCache[cacheKey]?.let(resolveContent)
+        ?: classLoader.getResources(normalizedPath).asSequence()
+            .firstNotNullOfOrNull(resolveContent)?.also { (url) ->
+                resourceCache[cacheKey] = url
+            }
 }
 
 /**
