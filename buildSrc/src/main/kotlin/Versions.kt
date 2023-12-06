@@ -4,7 +4,7 @@
 
 object Versions {
     val kotlin = "1.9.20"
-    val coroutines = "1.7.3"
+    val coroutines = "1.8.0-RC"
     val slf4j = "1.7.36"
     val junit = "4.13.2"
     val logback = "1.2.11"
