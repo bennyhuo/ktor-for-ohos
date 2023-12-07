@@ -19,6 +19,7 @@ kotlin.sourceSets {
         dependencies {
             api(project(":ktor-client:ktor-client-mock"))
             api(project(":ktor-test-dispatcher"))
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
     commonTest {
