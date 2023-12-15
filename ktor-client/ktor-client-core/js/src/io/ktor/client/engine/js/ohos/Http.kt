@@ -18,6 +18,7 @@ import kotlin.js.Promise
  * @since 10
  */
 @JsModule("@ohos.net.http")
+@JsNonModule
 internal external class Http {
     companion object {
 
