@@ -27,7 +27,7 @@ jobs:
           PUBLISHING_USER: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           PUBLISHING_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           PUBLISHING_URL: https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
-          PUBLISHING_SNAPSHOT_URL: https://s01.oss.sonatype.org/service/local/content/repositories/snapshots/
+          PUBLISHING_SNAPSHOT_URL: https://s01.oss.sonatype.org/content/repositories/snapshots/
           SIGN_KEY: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
           SIGN_KEY_ID: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
           SIGN_KEY_PASSPHRASE: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
