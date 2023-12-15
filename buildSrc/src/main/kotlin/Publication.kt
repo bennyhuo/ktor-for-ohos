@@ -67,7 +67,11 @@ fun Project.configurePublication() {
         println("Set publishing to repository $repositoryId")
         "https://oss.sonatype.org/service/local/staging/deployByRepositoryId/$repositoryId"
     } else {
-        System.getenv("PUBLISHING_URL")
+        if (version.toString().endsWith("SNAPSHOT")) {
+            System.getenv("PUBLISHING_SNAPSHOT_URL")
+        } else {
+            System.getenv("PUBLISHING_URL")
+        }
     }
 
     val publishLocal: Boolean by rootProject.extra
