@@ -7,6 +7,7 @@ package io.ktor.util
 public object PlatformUtils {
     public val IS_BROWSER: Boolean = platform == Platform.Browser
     public val IS_NODE: Boolean = platform == Platform.Node
+    public val IS_OHOS: Boolean = platform == Platform.Ohos
     public val IS_JVM: Boolean = platform == Platform.Jvm
     public val IS_NATIVE: Boolean = platform == Platform.Native
 
@@ -21,5 +22,5 @@ internal expect val PlatformUtils.isNewMemoryModel: Boolean
 public expect val PlatformUtils.platform: Platform
 
 public enum class Platform {
-    Jvm, Native, Browser, Node
+    Jvm, Native, Browser, Node, Ohos
 }

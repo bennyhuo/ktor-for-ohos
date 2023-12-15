@@ -4,12 +4,18 @@
 
 package io.ktor.utils.io.js
 
+import io.ktor.utils.io.js.ohos.Util
+import io.ktor.utils.io.js.ohos.toKtor
 import org.khronos.webgl.*
 
 internal fun Decoder(encoding: String, fatal: Boolean = true): Decoder = try {
     TextDecoder(encoding, textDecoderOptions(fatal)).toKtor()
 } catch (cause: Throwable) {
-    TextDecoderFallback(encoding, fatal)
+    try {
+        Util.TextDecoder(encoding, textDecoderOptions(fatal)).toKtor()
+    } catch (cause: Throwable) {
+        TextDecoderFallback(encoding, fatal)
+    }
 }
 
 internal interface Decoder {

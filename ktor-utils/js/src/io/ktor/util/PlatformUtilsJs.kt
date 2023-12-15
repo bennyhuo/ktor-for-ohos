@@ -24,5 +24,17 @@ public actual val PlatformUtils.platform: Platform
                     && window.process.versions.node != null)
                 """
         ) as Boolean
-        return if (hasNodeApi) Platform.Node else Platform.Browser
+
+        val hasWindowApi = js(
+                """
+                typeof window !== 'undefined'
+                """
+        ) as Boolean
+        return if (hasNodeApi) {
+            Platform.Node
+        } else if(hasWindowApi) {
+            Platform.Browser
+        } else {
+            Platform.Ohos
+        }
     }

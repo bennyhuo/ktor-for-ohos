@@ -4,6 +4,7 @@
 
 package io.ktor.util
 
+import io.ktor.util.ohos.*
 import kotlinx.coroutines.*
 import org.khronos.webgl.*
 import kotlin.js.*
@@ -12,10 +13,11 @@ import kotlin.js.*
  * Generates a nonce string.
  */
 public actual fun generateNonce(): String {
-    val buffer = ByteArray(NONCE_SIZE_IN_BYTES)
-    when (PlatformUtils.platform) {
-        Platform.Node -> _crypto.randomFillSync(buffer)
-        else -> _crypto.getRandomValues(buffer)
+    val buffer = when (PlatformUtils.platform) {
+        Platform.Ohos -> {
+            OhosCrypto.createRandom().generateRandomSync(NONCE_SIZE_IN_BYTES).data.asDynamic() as ByteArray
+        }
+        else -> _crypto.generateNonce()
     }
     return hex(buffer)
 }
@@ -35,8 +37,14 @@ public actual fun Digest(name: String): Digest = object : Digest {
 
     override suspend fun build(): ByteArray {
         val snapshot = state.reduce { a, b -> a + b }
-        val digestBuffer = _crypto.subtle.digest(name, snapshot).asDeferred().await()
-        val digestView = DataView(digestBuffer)
+        val digestView = if (PlatformUtils.IS_OHOS) {
+            val md = OhosCrypto.createMd(name)
+            val digestBuffer = md.digest(snapshot)
+            DataView(digestBuffer.buffer, digestBuffer.byteOffset, digestBuffer.length)
+        } else {
+            val digestBuffer = _crypto.subtle.digest(name, snapshot).asDeferred().await()
+            DataView(digestBuffer)
+        }
         return ByteArray(digestView.byteLength) { digestView.getUint8(it) }
     }
 }
@@ -60,6 +68,15 @@ private external class Crypto {
 
 private external class SubtleCrypto {
     fun digest(algoName: String, buffer: ByteArray): Promise<ArrayBuffer>
+}
+
+private fun Crypto.generateNonce(): ByteArray {
+    val buffer = ByteArray(NONCE_SIZE_IN_BYTES)
+    when (PlatformUtils.platform) {
+        Platform.Node -> _crypto.randomFillSync(buffer)
+        else -> _crypto.getRandomValues(buffer)
+    }
+    return buffer
 }
 
 /**

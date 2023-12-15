@@ -41,10 +41,13 @@ internal suspend fun commonFetch(
 internal fun AbortController(): AbortController {
     return when (PlatformUtils.platform) {
         Platform.Browser -> js("new AbortController()")
-        else -> {
+        Platform.Node -> {
             @Suppress("UNUSED_VARIABLE")
             val controller = js("eval('require')('abort-controller')")
             js("new controller()")
+        }
+        else -> {
+            throw UnsupportedOperationException()
         }
     }
 }
