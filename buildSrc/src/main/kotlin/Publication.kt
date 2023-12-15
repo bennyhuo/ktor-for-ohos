@@ -158,18 +158,18 @@ fun Project.configurePublication() {
     val publishToMavenLocal = tasks.getByName("publishToMavenLocal")
     tasks.getByName("publish").dependsOn(publishToMavenLocal)
 
-    val signingKey = System.getenv("SIGN_KEY_ID")
+    val signingKeyId = System.getenv("SIGN_KEY_ID")
+    val signingKey = System.getenv("SIGN_KEY")
     val signingKeyPassphrase = System.getenv("SIGN_KEY_PASSPHRASE")
 
-    if (signingKey != null && signingKey != "") {
-        extra["signing.gnupg.keyName"] = signingKey
+    if (signingKeyId != null && signingKeyId != "") {
+        extra["signing.gnupg.keyName"] = signingKeyId
         extra["signing.gnupg.passphrase"] = signingKeyPassphrase
 
         apply(plugin = "signing")
 
         the<SigningExtension>().apply {
-            useGpgCmd()
-
+            useInMemoryPgpKeys(signingKeyId, signingKey, signingKeyPassphrase)
             sign(the<PublishingExtension>().publications)
         }
 

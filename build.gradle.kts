@@ -102,7 +102,7 @@ doctor {
 }
 
 allprojects {
-    group = "io.ktor"
+    group = "com.bennyhuo.ktor" // "io.ktor"
     version = configuredVersion
     extra["hostManager"] = HostManager()
 
