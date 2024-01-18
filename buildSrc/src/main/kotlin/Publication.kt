@@ -6,6 +6,7 @@ import org.gradle.api.*
 import org.gradle.api.publish.*
 import org.gradle.api.publish.maven.*
 import org.gradle.api.publish.maven.tasks.*
+import org.gradle.configurationcache.extensions.*
 import org.gradle.jvm.tasks.*
 import org.gradle.kotlin.dsl.*
 import org.gradle.plugins.signing.*
@@ -196,9 +197,53 @@ fun Project.configurePublication() {
         publishLinuxX64PublicationToMavenRepository.dependsOn(signLinuxArm64Publication)
     }
 
-    val publishLinuxArm64PublicationToMavenRepository = tasks.findByName("publishLinuxArm64PublicationToMavenRepository")
+    val publishLinuxArm64PublicationToMavenRepository =
+        tasks.findByName("publishLinuxArm64PublicationToMavenRepository")
     val signLinuxX64Publication = tasks.findByName("signLinuxX64Publication")
     if (publishLinuxArm64PublicationToMavenRepository != null && signLinuxX64Publication != null) {
         publishLinuxArm64PublicationToMavenRepository.dependsOn(signLinuxX64Publication)
+    }
+
+    val publicationSet = setOf(
+        "iosX64",
+        "iosArm64",
+        "iosSimulatorArm64",
+
+        "watchosX64",
+        "watchosArm32",
+        "watchosArm64",
+        "watchosSimulatorArm64",
+
+        "tvosX64",
+        "tvosArm64",
+        "tvosSimulatorArm64",
+
+        "macosX64",
+        "macosArm64",
+
+        "jvm",
+        "js",
+        "kotlinMultiplatform",
+
+        "linuxX64",
+        "linuxArm64",
+        "mingwX64"
+    )
+
+    val signTaskList = publicationSet.map {
+        tasks.findByName("sign${it.capitalized()}Publication")
+    }
+    val taskList = publicationSet.map {
+        tasks.findByName("publish${it.capitalized()}PublicationToMavenRepository")
+    }
+
+    taskList.forEach { task ->
+        if (task != null) {
+            signTaskList.forEach {
+                if (it != null) {
+                    task.dependsOn(it)
+                }
+            }
+        }
     }
 }
